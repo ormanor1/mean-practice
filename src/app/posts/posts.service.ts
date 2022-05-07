@@ -9,9 +9,11 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class PostsService {
+  url = 'http://localhost:3000/api/posts/';
+
   private posts: Posts = [];
   private postsUpdated = new Subject<{ posts: Posts; postsCount: number }>();
-  url = 'http://localhost:3000/api/posts/';
+
   constructor(private http: HttpClient, private router: Router) {}
 
   getPosts(postsPerPage: number, currentPage: number) {
