@@ -3,13 +3,15 @@ import { Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AuthData } from './auth.model';
+import { environment } from 'src/environments/environment';
+
+const BACKEND_URL = environment.apiUrl + '/users/';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private isAuth = false;
-  private url = 'http://localhost:3000/api/users';
   private token: string;
   private userId: string;
   private authStatusListener = new Subject<boolean>();
@@ -35,7 +37,7 @@ export class AuthService {
   createUser(email: string, password: string) {
     const authData: AuthData = { email, password };
 
-    return this.http.post(this.url + '/signup', authData).subscribe(
+    return this.http.post(BACKEND_URL + '/signup', authData).subscribe(
       () => {
         this.redirectTo('/');
       },
@@ -49,7 +51,7 @@ export class AuthService {
     const authData: AuthData = { email, password };
     this.http
       .post<{ token: string; expiresIn: number; userId: string }>(
-        this.url + '/login',
+        BACKEND_URL + '/login',
         authData
       )
       .subscribe(

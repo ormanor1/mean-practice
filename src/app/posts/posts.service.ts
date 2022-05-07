@@ -5,12 +5,14 @@ import { Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
+import { environment } from 'src/environments/environment';
+
+const BACKEND_URL = environment.apiUrl + '/posts/';
+
 @Injectable({
   providedIn: 'root',
 })
 export class PostsService {
-  url = 'http://localhost:3000/api/posts/';
-
   private posts: Posts = [];
   private postsUpdated = new Subject<{ posts: Posts; postsCount: number }>();
 
@@ -20,7 +22,7 @@ export class PostsService {
     const queryParams = `?pagesize=${postsPerPage}&page=${currentPage}`;
     this.http
       .get<{ message: string; posts: any; maxPosts: number }>(
-        this.url + queryParams
+        BACKEND_URL + queryParams
       )
       .pipe(
         map((postData) => {
@@ -52,7 +54,7 @@ export class PostsService {
       title: string;
       content: string;
       creator: string;
-    }>(this.url + id);
+    }>(BACKEND_URL + id);
   }
 
   getUserId() {}
@@ -61,7 +63,7 @@ export class PostsService {
     const post: Post = { id: 'undefined', title, content, creator: '' };
 
     this.http
-      .post<{ message: string; postId: string }>(this.url, post)
+      .post<{ message: string; postId: string }>(BACKEND_URL, post)
       .subscribe((resData) => {
         this.navigateOnSave();
       });
@@ -70,13 +72,13 @@ export class PostsService {
   updatePost(id: string, title: string, content: string) {
     const post: Post = { id, title, content, creator: '' };
 
-    this.http.put(this.url + id, post).subscribe((res) => {
+    this.http.put(BACKEND_URL + id, post).subscribe((res) => {
       this.navigateOnSave();
     });
   }
 
   deletePost(postId: string) {
-    return this.http.delete(this.url + postId);
+    return this.http.delete(BACKEND_URL + postId);
   }
 
   navigateOnSave() {

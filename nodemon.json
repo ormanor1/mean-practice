@@ -1,0 +1,7 @@
+{
+  "env": {
+    "MONGO_ATLAS_USER": "ormano",
+    "MONGO_ATLAS_PASSWORD": "bY96jXpS7OMO977z",
+    "JWT_KEY": "secret_this_should_be_longer"
+  }
+}
