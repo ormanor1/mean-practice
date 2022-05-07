@@ -10,6 +10,7 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
   styleUrls: ['./post-create.component.scss'],
 })
 export class PostCreateComponent implements OnInit {
+  userId = '';
   private mode = 'create';
   private postId: string = '';
   public post: Post;
@@ -33,6 +34,7 @@ export class PostCreateComponent implements OnInit {
             id: postData._id,
             title: postData.title,
             content: postData.content,
+            creator: postData.creator,
           };
         });
       } else {

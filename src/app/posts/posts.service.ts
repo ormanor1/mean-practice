@@ -30,6 +30,7 @@ export class PostsService {
                 title: post.title,
                 content: post.content,
                 id: post._id,
+                creator: post.creator,
               };
             }),
             maxPosts: postData.maxPosts,
@@ -38,7 +39,6 @@ export class PostsService {
       )
       .subscribe((transformedPostsData) => {
         this.posts = transformedPostsData.posts;
-
         this.postsUpdated.next({
           posts: [...this.posts],
           postsCount: transformedPostsData.maxPosts,
@@ -47,13 +47,18 @@ export class PostsService {
   }
 
   getPost(id: string) {
-    return this.http.get<{ _id: string; title: string; content: string }>(
-      this.url + id
-    );
+    return this.http.get<{
+      _id: string;
+      title: string;
+      content: string;
+      creator: string;
+    }>(this.url + id);
   }
 
+  getUserId() {}
+
   addPost(title: string, content: string): void {
-    const post: Post = { id: 'undefined', title, content };
+    const post: Post = { id: 'undefined', title, content, creator: '' };
 
     this.http
       .post<{ message: string; postId: string }>(this.url, post)
@@ -63,7 +68,7 @@ export class PostsService {
   }
 
   updatePost(id: string, title: string, content: string) {
-    const post: Post = { id, title, content };
+    const post: Post = { id, title, content, creator: '' };
 
     this.http.put(this.url + id, post).subscribe((res) => {
       this.navigateOnSave();
