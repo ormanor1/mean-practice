@@ -1,6 +1,8 @@
+import { AuthService } from 'src/app/auth/auth.service';
+import { Subscription } from 'rxjs';
 import { Post } from './../post.model';
 import { PostsService } from './../posts.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 
@@ -9,19 +11,25 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
   templateUrl: './post-create.component.html',
   styleUrls: ['./post-create.component.scss'],
 })
-export class PostCreateComponent implements OnInit {
-  userId = '';
+export class PostCreateComponent implements OnInit, OnDestroy {
   private mode = 'create';
   private postId: string = '';
+  private authStatusSub: Subscription;
   public post: Post;
   isLoading = false;
 
   constructor(
     private postService: PostsService,
-    public route: ActivatedRoute
+    public route: ActivatedRoute,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
+    this.authStatusSub = this.authService
+      .getAuthStatusListener()
+      .subscribe((authStatus) => {
+        this.isLoading = false;
+      });
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
       if (paramMap.has('postId')) {
         this.mode = 'edit';
@@ -60,5 +68,8 @@ export class PostCreateComponent implements OnInit {
         form.value.title
       );
     }
+  }
+  ngOnDestroy(): void {
+    this.authStatusSub.unsubscribe();
   }
 }

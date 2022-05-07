@@ -35,7 +35,14 @@ export class AuthService {
   createUser(email: string, password: string) {
     const authData: AuthData = { email, password };
 
-    this.http.post(this.url + '/signup', authData).subscribe((response) => {});
+    return this.http.post(this.url + '/signup', authData).subscribe(
+      () => {
+        this.redirectTo('/');
+      },
+      (err) => {
+        this.authStatusListener.next(false);
+      }
+    );
   }
 
   loginUser(email: string, password: string) {
@@ -45,23 +52,28 @@ export class AuthService {
         this.url + '/login',
         authData
       )
-      .subscribe((response) => {
-        this.token = response.token;
-        if (!this.token) return;
+      .subscribe(
+        (response) => {
+          this.token = response.token;
+          if (!this.token) return;
 
-        const expiersInDuration = response.expiresIn;
-        this.setAuthTimer(expiersInDuration);
-        this.isAuth = true;
-        this.userId = response.userId;
-        this.authStatusListener.next(true);
-        const now = new Date();
-        const expirationDate = new Date(
-          now.getTime() + expiersInDuration * 1000
-        );
+          const expiersInDuration = response.expiresIn;
+          this.setAuthTimer(expiersInDuration);
+          this.isAuth = true;
+          this.userId = response.userId;
+          this.authStatusListener.next(true);
+          const now = new Date();
+          const expirationDate = new Date(
+            now.getTime() + expiersInDuration * 1000
+          );
 
-        this.saveAuthData(this.token, expirationDate, this.userId);
-        this.redirectTo('/');
-      });
+          this.saveAuthData(this.token, expirationDate, this.userId);
+          this.redirectTo('/');
+        },
+        (error) => {
+          this.authStatusListener.next(false);
+        }
+      );
   }
 
   autoAuthUser() {
@@ -93,7 +105,8 @@ export class AuthService {
     clearTimeout(this.tokenTimer);
     this.clearAuthData();
     this.userId = '';
-    this.redirectTo('/');
+
+    this.redirectTo('/login');
   }
 
   private setAuthTimer(duration: number) {
